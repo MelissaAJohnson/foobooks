@@ -14,7 +14,10 @@
 Route::get('/', function () {
     return view('welcome');
 });
+<<<<<<< HEAD
 
 Route::get('/practice', function() {
 	echo App::environment();
 });
+=======
+>>>>>>> 0d68d22d87225e3f5ec5be8fb4415722e3570ebe
