@@ -11,11 +11,24 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+	Route::get('/', function () {
+    	return view('welcome');
+	});
 
-Route::get('/practice', function() {
-	echo App::environment();
-});
+	Route::get('/books', 'BookController@getIndex');
 
+	Route::get('/books/show/{title}', 'BookController@getShow');
+
+	Route::get('/books/create', 'BookController@getCreate');
+
+	Route::post('/books/create', 'BookController@postCreate');
+
+	Route::get('/practice', function() {
+    	$data = Array('foo' => 'bar');
+    	Debugbar::info($data);
+    	Debugbar::error('Error!');
+    	Debugbar::warning('Watch out…');
+    	Debugbar::addMessage('Another message', 'mylabel');
+
+    	return 'Practice';
+});
