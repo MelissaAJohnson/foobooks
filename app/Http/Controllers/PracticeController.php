@@ -8,6 +8,62 @@ use App\Http\Controllers\Controller;
 
 class PracticeController extends Controller
 {
+    // Create example
+    function getExample4(){
+        $book = new \App\Book();
+
+        $book->title = "Harry Potter";
+        $book->author = "J.K. Rowling";
+
+        $book->save();
+
+        return 'Example 4';
+    }
+
+    // Delete example
+    function getExample5() {
+        $book = \App\Book::where('id', '=', 11);
+
+        if($book) {
+            $book->delete();
+            return 'Book deleted';
+        } else {
+            return 'Book not found';
+        }
+    }
+
+    // Update example
+    function getExample6() {
+        $book = \App\Book->where('author', 'Like', '%Scott%')->get();
+
+        if($book) {
+            $book->title = "The Beautiful and Damned";
+            $book->save();
+
+            echo "Update complete; check database to verify update";
+        } else {
+            echo "Book not found, can't update";
+        }
+    }
+
+
+    // Read example
+    function getBooksWithEloquent() {
+        $books = \App\Book::all();
+
+        # Make sure we have results before trying to print them...
+        if(!$books->isEmpty()) {
+
+            // Output the books
+            foreach($books as $book) {
+                echo $book->title.', '.$book->author.'<br>';
+            }
+        }
+        else {
+            echo 'No books found';
+        }
+    }
+
     function getBooksWithQueryBuilder() {
 
         $books = \DB::table('books')->get();
@@ -15,6 +71,20 @@ class PracticeController extends Controller
         foreach($books as $book) {
             echo $book->title.'<br>';
         }
+    }
+
+    function getCreateNewBookWithQueryBuilder() {
+        \DB::table('books')->insert([
+        'created_at' => \Carbon\Carbon::now()->toDateTimeString(),
+        'updated_at' => \Carbon\Carbon::now()->toDateTimeString(),
+        'title' => 'The Great Gatsby',
+        'author' => 'F. Scott Fitzgerald',
+        'published' => 1925,
+        'cover' => 'http://img2.imagesbn.com/p/9780743273565_p0_v4_s114x166.JPG',
+        'purchase_link' => 'http://www.barnesandnoble.com/w/the-great-gatsby-francis-scott-fitzgerald/1116668135?ean=9780743273565',
+        ]);
+
+        return 'New book added';
     }
 
 }
