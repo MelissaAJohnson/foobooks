@@ -1,5 +1,4 @@
 <?php
-
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -10,53 +9,101 @@
 | and give it the controller to call when that URI is requested.
 |
 */
+# Reminder: 5 Route methods are: get, post, put, delete, or all
 
-	Route::get('/', function () {
-    	return view('welcome');
-	});
+# Show login form
+Route::get('/login', 'Auth\AuthController@getLogin');
 
-	Route::get('/books', 'BookController@getIndex');
+# Process login form
+Route::post('/login', 'Auth\AuthController@postLogin');
 
-	Route::get('/books/show/{title}', 'BookController@getShow');
-
-	Route::get('/books/create', 'BookController@getCreate');
-
-	Route::post('/books/create', 'BookController@postCreate');
-
-	Route::controller('/practice', 'PracticeController');
+# Process logout
+Route::get('/logout', 'Auth\AuthController@getLogout');
 
 
-	Route::get('/debug', function() {
+# Show registration form
+Route::get('/register', 'Auth\AuthController@getRegister');
 
-        echo '<pre>';
+# Process registration form
+Route::post('/register', 'Auth\AuthController@postRegister');
 
-        echo '<h1>Environment</h1>';
-        echo App::environment().'</h1>';
+Route::get('/confirm-login-worked', function() {
 
-        echo '<h1>Debugging?</h1>';
-        if(config('app.debug')) echo "Yes"; else echo "No";
+    # You may access the authenticated user via the Auth facade
+    $user = Auth::user();
 
-        echo '<h1>Database Config</h1>';
-        /*
-        The following line will output your MySQL credentials.
-        Uncomment it only if you're having a hard time connecting to the database and you
-        need to confirm your credentials.
-        When you're done debugging, comment it back out so you don't accidentally leave it
-        running on your live server, making your credentials public.
-        */
-        //print_r(config('database.connections.mysql'));
+    if($user) {
+        echo 'You are logged in.';
+        dump($user->toArray());
+    } else {
+        echo 'You are not logged in.';
+    }
 
-        echo '<h1>Test Database Connection</h1>';
-        try {
-            $results = DB::select('SHOW DATABASES;');
-            echo '<strong style="background-color:green; padding:5px;">Connection confirmed</strong>';
-            echo "<br><br>Your Databases:<br><br>";
-            print_r($results);
-        }
-        catch (Exception $e) {
-            echo '<strong style="background-color:crimson; padding:5px;">Caught exception: ', $e->getMessage(), "</strong>\n";
-        }
+    return;
 
-        echo '</pre>';
+});
 
+
+
+/*----------------------------------------------------
+/books
+-----------------------------------------------------*/
+Route::get('/', 'BookController@getIndex');
+Route::get('/books', 'BookController@getIndex');
+Route::get('/books/show/{title?}', 'BookController@getShow');
+// Route::get('/books/create', 'BookController@getCreate');
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('/books/create', 'BookController@getCreate');
+    Route::post('/books/create', 'BookController@postCreate');
+
+    Route::get('/books/edit/{id?}', 'BookController@getEdit');
+    Route::post('/books/edit', 'BookController@postEdit');
+});
+
+
+Route::get('/books/delete/{id}', 'BookController@postDelete');
+Route::post('/books/delete', 'BookController@postDelete');
+# Alternative to the above, using implicit Controller routing
+//Route::controller('/books','BookController');
+/*----------------------------------------------------
+/practice
+-----------------------------------------------------*/
+Route::controller('/practice','PracticeController');
+/*----------------------------------------------------
+Debugging/Local/Misc
+-----------------------------------------------------*/
+if(App::environment('local')) {
+    Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
+    Route::get('/drop', function() {
+        DB::statement('DROP database foobooks');
+        DB::statement('CREATE database foobooks');
+        return 'Dropped foobooks; created foobooks.';
     });
+};
+Route::get('/debug', function() {
+    echo '<pre>';
+    echo '<h1>Environment</h1>';
+    echo App::environment().'</h1>';
+    echo '<h1>Debugging?</h1>';
+    if(config('app.debug')) echo "Yes"; else echo "No";
+    echo '<h1>Database Config</h1>';
+    /*
+    The following line will output your MySQL credentials.
+    Uncomment it only if you're having a hard time connecting to the database and you
+    need to confirm your credentials.
+    When you're done debugging, comment it back out so you don't accidentally leave it
+    running on your live server, making your credentials public.
+    */
+    //print_r(config('database.connections.mysql'));
+    echo '<h1>Test Database Connection</h1>';
+    try {
+        $results = DB::select('SHOW DATABASES;');
+        echo '<strong style="background-color:green; padding:5px;">Connection confirmed</strong>';
+        echo "<br><br>Your Databases:<br><br>";
+        print_r($results);
+    }
+    catch (Exception $e) {
+        echo '<strong style="background-color:crimson; padding:5px;">Caught exception: ', $e->getMessage(), "</strong>\n";
+    }
+    echo '</pre>';
+});

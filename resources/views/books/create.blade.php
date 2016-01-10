@@ -1,8 +1,7 @@
 @extends('layouts.master')
 
-
 @section('title')
-    Create book
+    Create Book
 @stop
 
 
@@ -12,18 +11,81 @@ Use it to add specific things that *this* View needs in the head,
 such as a page specific styesheets.
 --}}
 @section('head')
-    <link href="/css/books/create.css" type='text/css' rel='stylesheet'>
+    {{-- <link href="/css/books/create.css" type='text/css' rel='stylesheet'> --}}
 @stop
 
 
+
 @section('content')
-    <br>
-    <form method="POST" action="/books/create">
-        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-        <input type="text" name="title">
-        <input type="submit">
+
+    <h1>Add a new book</h1>
+
+    @if(count($errors) > 0)
+    <ul>
+        @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+    @endif
+
+    <form method='POST' action='/books/create'>
+
+        <input type='hidden' value='{{ csrf_token() }}' name='_token'>
+
+        <fieldset>
+            <label>* Title:</label>
+            <input
+                type='text'
+                id='title'
+                name='title'
+                value='{{ old('title','Green Eggs & Ham') }}'
+            >
+        </fieldset>
+
+        <fieldset>
+            <label for='title'>* Author:</label>
+            <input
+                type='text'
+                id='author'
+                name="author"
+                value='{{ old('author','Dr. Seuss') }}'
+            >
+        </fieldset>
+
+        <fieldset>
+            <label for='title'>* Cover (URL):</label>
+            <input
+                type='text'
+                id='cover'
+                name="cover"
+                value='{{ old('cover','http://prodimage.images-bn.com/pimages/9780394800165_p0_v4_s118x184.jpg') }}'
+                >
+        </fieldset>
+
+        <fieldset>
+            <label for='Published'>Published (YYYY):</label>
+            <input
+                type='text'
+                id='published'
+                name="published"
+                value='{{ old('published','1960') }}'
+                >
+        </fieldset>
+
+        <fieldset>
+            <label for='title'>* URL To purchase this book:</label>
+            <input
+                type='text'
+                id='purchase_link'
+                name='purchase_link'
+                value='{{ old('purchase_link','http://www.barnesandnoble.com/w/green-eggs-and-ham-dr-seuss/1100170349?ean=9780394800165') }}'
+                >
+        </fieldset>
+
+        <br>
+        <button type="submit" class="btn btn-primary">Add book</button>
     </form>
-    <br>
+
 @stop
 
 
@@ -33,5 +95,5 @@ Use it to add specific things that *this* View needs at the end of the body,
 such as a page specific JavaScript files.
 --}}
 @section('body')
-
+    {{-- <script src="/js/books/create.js"></script> --}}
 @stop
